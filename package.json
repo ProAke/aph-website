@@ -1,0 +1,26 @@
+{
+  "name": "aph-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --host 0.0.0.0",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "data:build": "node scripts/build-dataset.mjs",
+    "db:init": "node scripts/db-init.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:reset": "node scripts/db-init.mjs --reset",
+    "import:wp": "node scripts/import-wordpress.mjs",
+    "import:wp:full": "node scripts/import-wordpress.mjs --images --dump-json"
+  },
+  "dependencies": {
+    "mysql2": "^3.24.6",
+    "nuxt": "^3.21.11",
+    "vue": "^3.5.45",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "node-sql-parser": "^5.4.0"
+  }
+}

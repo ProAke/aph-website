@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: aph-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root_secret}
+      MARIADB_DATABASE: ${NUXT_DB_NAME:-aph_website}
+      MARIADB_USER: ${NUXT_DB_USER:-aph}
+      MARIADB_PASSWORD: ${NUXT_DB_PASSWORD:-aph_secret}
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=256M
+    ports:
+      - "${NUXT_DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mariadb_data:

@@ -1,0 +1,208 @@
+# id|slug|name|cat_ids|media_id|image_url_override
+19863|sp-4-mdvt-8|SP-4-MDVT-8|149|21185|
+19862|sp-4-mdv-2|SP-4-MDV-2|149|21185|
+19861|sp-4-mdv|SP-4-MDV|149|21185|
+19860|sp-4-mdt|SP-4-MDT|149|21185|
+19859|sp-4-mdq|SP-4-MDQ|149|21185|
+19858|sp-4-mdht-8b|SP-4-MDHT-8B|149|21182|
+19857|sp-4-mdht-8|SP-4-MDHT-8|149|21182|
+19856|sp-4-mdht|SP-4-MDHT|149|21182|
+19855|sp-4-mdh|SP-4-MDH|149|21182|
+19854|sp-4-mdat|SP-4-MDAT|149|21185|
+19853|sp-4-mda|SP-4-MDA|149|21185|
+19852|sp-4-md-8|SP-4-MD-8|149|21185|
+19851|sp-4-mc|SP-4-MC|149|19866|
+19850|sp-4-fsl|SP-4-FSL|149|19849|
+19848|sp-4-fsg|SP-4-FSG|149|19847|
+19846|sp-4-fs|SP-4-FS|149|19845|
+19844|sp-4-fnsl|SP-4-FNSL|149|19843|
+19842|sp-4-fnsg|SP-4-FNSG|149|19841|
+19840|sp-4-fns|SP-4-FNS|149|21183|
+19839|sp-4-fnl|SP-4-FNL|149|19838|
+19837|sp-4-fng|SP-4-FNG|149|19836|
+19835|sp-4-fn|SP-4-FN|149|21184|
+19834|sp-4-fl|SP-4-FL|149|19833|
+19832|sp-4-fg|SP-4-FG|149|19831|
+19830|sp-4-fbsl|SP-4-FBSL|149|19829|
+19828|sp-4-fbsg|SP-4-FBSG|149|19827|
+19826|sp-4-fbs|SP-4-FBS|149|19825|
+19824|sp-4-fbl|SP-4-FBL|149|19823|
+19822|sp-4-fbg|SP-4-FBG|149|19821|
+19820|sp-4-fb|SP-4-FB|149|19819|
+19818|sp-2-mdv|SP-2-MDV|149|21186|
+19817|sp-2-mdh|SP-2-MDH|149|21186|
+19816|sp-2-md|SP-2-MD|149|19865|
+19815|sp-2-fsl|SP-2-FSL|149|19814|
+19813|sp-2-fsg|SP-2-FSG|149|19812|
+19811|sp-2-fs|SP-2-FS|149|19810|
+19809|sp-2-fnsl|SP-2-FNSL|149|19808|
+19807|sp-2-fnsg|SP-2-FNSG|149|21181|
+19806|sp-2-fns|SP-2-FNS|149|19805|
+19804|sp-2-fnl|SP-2-FNL|149|19803|
+19802|sp-2-fng|SP-2-FNG|149|19801|
+19800|sp-2-fn|SP-2-FN|149|19799|
+19798|sp-2-fl|SP-2-FL|149|19797|
+19796|sp-2-fg|SP-2-FG|149|19795|
+19794|sp-2-fbsl|SP-2-FBSL|149|19793|
+19792|sp-2-fbsg|SP-2-FBSG|149|19791|
+19790|sp-2-fbs|SP-2-FBS|149|19789|
+19788|sp-2-fbl|SP-2-FBL|149|19787|
+19786|sp-2-fbg|SP-2-FBG|149|21181|
+19785|sp-2-fb|SP-2-FB|149|19784|
+16477|sp-series-ep-8-14b|SP Series – EP-8-14B|150|18668|
+16476|sp-series-ep-8-14|SP Series – EP-8-14|150|18669|
+16475|sp-series-ep-8-13pb|SP Series – EP-8-13PB|150|18670|
+16474|sp-series-ep-8-13p|SP Series – EP-8-13P|150|18671|
+16473|sp-series-ep-8-12b|SP Series – EP-8-12B|150|18672|
+16472|sp-series-ep-8-12|SP Series – EP-8-12|150|18673|
+16471|sp-series-ep-8-11pb|SP Series – EP-8-11PB|150|18674|
+16470|sp-series-ep-8-11p|SP Series – EP-8-11P|150|18675|
+16469|sp-series-ep-6-14b|SP Series – EP-6-14B|150|18676|
+16468|sp-series-ep-6-14|SP Series – EP-6-14|150|18677|
+16467|sp-series-ep-6-13pb|SP Series – EP-6-13PB|150|18678|
+16466|sp-series-ep-6-13p|SP Series – EP-6-13P|150|18679|
+16465|sp-series-ep-6-12b|SP Series – EP-6-12B|150|18680|
+16464|sp-series-ep-6-12|SP Series – EP-6-12|150|18681|
+16463|sp-series-ep-6-11pb|SP Series – EP-6-11PB|150|18682|
+16462|sp-series-ep-6-11p|SP Series – EP-6-11P|150|18683|
+16461|sp-series-ep-5-14b|SP Series – EP-5-14B|150|18684|
+16460|sp-series-ep-5-14|SP Series – EP-5-14|150|18685|
+16425|acpr-syl|ACPR-SYL|143|18623|
+16424|acpr-swh|ACPR-SWH|143|18623|
+16423|acpr-srd|ACPR-SRD|143|18623|
+16422|acpr-sgr|ACPR-SGR|143|18623|
+16421|acpr-sbl|ACPR-SBL|143|18623|
+16420|acpr-sbk|ACPR-SBK|143|18623|
+16419|acpr-red|ACPR-RED|143|18622|
+16418|acpr-grn|ACPR-GRN|143|18622|
+16417|acpr-blu|ACPR-BLU|143|18622|
+16416|acpr-blk|ACPR-BLK|143|18622|
+16415|acpr|ACPR|143|18622|
+16414|acpl-cyl|ACPL-CYL|143|18624|
+16413|acpl-cwh|ACPL-CWH|143|18624|
+16412|acpl-crd|ACPL-CRD|143|18624|
+16411|acpl-cgr|ACPL-CGR|143|18624|
+16410|acpl-cbl|ACPL-CBL|143|18624|
+16409|acpl-cbk|ACPL-CBK|143|18624|
+16408|acpl|ACPL|143|18624|
+16407|acjr-yel|ACJR-YEL|143|18625|
+16406|acjr-wht|ACJR-WHT|143|18625|
+16405|acjr-syl|ACJR-SYL|143|18626|
+16404|acjr-swh|ACJR-SWH|143|18626|
+16403|acjr-srd|ACJR-SRD|143|18626|
+16402|acjr-sgr|ACJR-SGR|143|18626|
+16401|acjr-sbl|ACJR-SBL|143|18626|
+16400|acjr-sbk|ACJR-SBK|143|18626|
+16399|acjr-red|ACJR-RED|143|18625|
+16398|acjr-grn|ACJR-GRN|143|18625|
+16397|acjr-blu|ACJR-BLU|143|18625|
+16396|acjr-blk|ACJR-BLK|143|18625|
+16395|acjd-yel|ACJD-YEL|143|18627|
+16394|acjd-wht|ACJD-WHT|143|18627|
+16393|acjd-red|ACJD-RED|143|18627|
+16392|acjd-grn|ACJD-GRN|143|18627|
+16391|acjd-blu|ACJD-BLU|143|18627|
+16390|acjd-blk|ACJD-BLK|143|18627|
+16387|phone-jack-connectors-ts3rj-au|Phone Jack Connectors – TS3RJ-AU|142,105|18644|
+16386|phone-jack-connectors-ts3rj|Phone Jack Connectors – TS3RJ|142,105|18644|
+16385|phone-jack-connectors-ts3rbj-au|Phone Jack Connectors – TS3RBJ-AU|142,105|18642|
+16384|phone-jack-connectors-ts3rbj|Phone Jack Connectors – TS3RBJ|142,105|18642|
+16383|phone-jack-connectors-ts3pj|Phone Jack Connectors – TS3PJ|142,105|18637|
+16382|phone-jack-connectors-ts3pbj|Phone Jack Connectors – TS3PBJ|142,105|18638|
+16381|phone-jack-connectors-ts3pb-au|Phone Jack Connectors – TS3PB-AU|142,105|18638|
+16380|phone-jack-connectors-ts3pb|Phone Jack Connectors – TS3PB|142,105|18638|
+16379|phone-jack-connectors-ts3p-au|Phone Jack Connectors – TS3P-AU|142,105|18637|
+16378|phone-jack-connectors-ts3p|Phone Jack Connectors – TS3P|142,105|18637|
+16377|phone-jack-connectors-tm2rj-au|Phone Jack Connectors – TM2RJ-AU|142,105|18645|
+16376|phone-jack-connectors-tm2rj|Phone Jack Connectors – TM2RJ|142,105|18645|
+16375|phone-jack-connectors-tm2rbj-au|Phone Jack Connectors – TM2RBJ-AU|142,105|18643|
+16374|phone-jack-connectors-tm2rbj|Phone Jack Connectors – TM2RBJ|142,105|18643|
+16373|phone-jack-connectors-tm2pnj|Phone Jack Connectors – TM2PNJ|142,105|18641|
+16372|phone-jack-connectors-tm2pn-au|Phone Jack Connectors – TM2PN-AU|142,105|18641|
+16371|phone-jack-connectors-tm2pn|Phone Jack Connectors – TM2PN|142,105|18641|
+16370|phone-jack-connectors-tm2pj|Phone Jack Connectors – TM2PJ|142,105|21160|
+16369|phone-jack-connectors-tm2pbj|Phone Jack Connectors – TM2PBJ|142,105|18640|
+16368|phone-jack-connectors-tm2pb-au|Phone Jack Connectors – TM2PB-AU|142,105|18640|
+16367|phone-jack-connectors-tm2pb|Phone Jack Connectors – TM2PB|142,105|18640|
+16366|phone-jack-connectors-tm2p-au|Phone Jack Connectors – TM2P-AU|142,105|18639|
+16365|phone-jack-connectors-tm2p|Phone Jack Connectors – TM2P|142,105|18632|
+16364|phone-jack-connectors-tm1rj-au|Phone Jack Connectors – TM1RJ-AU|142,105|18652|
+16363|phone-jack-connectors-tm1rj|Phone Jack Connectors – TM1RJ|142,105|18652|
+16362|phone-jack-connectors-tm1rbj-au|Phone Jack Connectors – TM1RBJ-AU|142,105|18653|
+16361|phone-jack-connectors-tm1rbj|Phone Jack Connectors – TM1RBJ|142,105|18653|
+16185|mp-41-series-th29-1|MP-41 Series – TH29-1|145|19753|
+16181|mp-41-series-mp-ins-18|MP-41 Series – MP-INS-18|145|18710|
+16180|mp-41-series-mp-ins-16|MP-41 Series – MP-INS-16|145|18711|
+16179|mp-41-series-mp-guide-18|MP-41 Series – MP-GUIDE-18|145|18712|
+16178|mp-41-series-mp-guide-16|MP-41 Series – MP-GUIDE-16|145|18713|
+16176|mp-41-series-mp-742-61s|MP-41 Series – MP-742-61S|145|19763|
+16175|mp-41-series-mp-742-61l|MP-41 Series – MP-742-61L|145|18715|
+16174|mp-41-series-mp-742-39s|MP-41 Series – MP-742-39S|145|18716|
+16173|mp-41-series-mp-742-39l|MP-41 Series – MP-742-39L|145|18717|
+16172|mp-41-series-mp-738-61s|MP-41 Series – MP-738-61S|145|18718|
+16171|mp-41-series-mp-738-61l|MP-41 Series – MP-738-61L|145|18719|
+16170|mp-41-series-mp-738-39s|MP-41 Series – MP-738-39S|145|18720|
+16038|mini-xlr-connectors-ag6mcch|Mini XLR Connectors – AG6MCCH|166,144|18611|
+16037|mini-xlr-connectors-ag6mcc|Mini XLR Connectors – AG6MCC|166,144|18603|
+16036|mini-xlr-connectors-ag6m|Mini XLR Connectors – AG6M|166,144|18591|
+16035|mini-xlr-connectors-ag6fl|Mini XLR Connectors – AG6FL|166,144|18599|
+16034|mini-xlr-connectors-ag6fcrv|Mini XLR Connectors – AG6FCRV|166,144|18620|
+16033|mini-xlr-connectors-ag6fce|Mini XLR Connectors – AG6FCE|166,144|18607|
+16032|mini-xlr-connectors-ag6fcch|Mini XLR Connectors – AG6FCCH|166,144|18615|
+16031|mini-xlr-connectors-ag6f|Mini XLR Connectors – AG6F|166,144|18595|
+16030|mini-xlr-connectors-ag5mcch|Mini XLR Connectors – AG5MCCH|166,144|18610|
+16029|mini-xlr-connectors-ag5mcc|Mini XLR Connectors – AG5MCC|166,144|18602|
+16028|mini-xlr-connectors-ag5m|Mini XLR Connectors – AG5M|166,144|18590|
+16027|mini-xlr-connectors-ag5fl|Mini XLR Connectors – AG5FL|166,144|18598|
+11576|hpt-capsf|HPT-CAPSF – Power Connector|153,139|11566|
+11574|hpt-capsm|HPT-CAPSM – Power Connector|153,139|11567|
+11554|hpt-capd|HPT-CAPD – Power Connector|153,139|11562|
+11553|hpt-capf|HPT-CAPF – Power Connector|153,139|11563|
+11550|hpt-capm|HPT-CAPM – Power Connector|153,139|11564|
+11549|hpt-3-cc|HPT-3-CC – Power Connector|153,139|11558|
+11543|hpt-3-mdw|HPT-3-MDW – Power Connector|153,139|11572|
+11539|hpt-3-md|HPT-3-MD – Power Connector|153,139|11542|
+11535|hpt-3-fj|HPT-3-FJ – Power Connector|153,139|11515|
+11530|hpt-3-f|HPT-3-F – Power Connector|153,139|11515|
+11528|hpt-3-mj|HPT-3-MJ – Power Connector|153,139|11515|
+11514|hpt-3-m|HPT-3-M – Power Connector|153,139|11515|
+11498|hp-series-power-connector-hp-3-mdw|HP-3-MDW – Power Connector|152,139|11448|
+11496|hp-3-mdg|HP-3-MDG – Power Connector|152,139|11449|
+11494|hp-series-power-connector-hp-3-md|HP-3-MD – Power Connector|152,139|11448|
+11491|hp-3-fgj|HP-3-FGJ – Power Connector|152,139|11447|
+11469|hp-3-fg|HP-3-FG – Power Connector|152,139|11447|
+11442|hp-3-f|HP-3-F – Power Connector|152,139|11446|
+11645|rjd2203-0050|RJD2203-0050 – หัวแปลงสัญญาณ Dante แบบรับเข้า 2 ช่องสัญญาณ|155,240|11638|
+11643|rjd2103-0050|RJD2103-0050 – หัวแปลงสัญญาณ Dante แบบรับเข้า 1 ช่องสัญญาณ|155,240|20183|
+11640|rjd1212-0050|RJD1212-0050 – หัวแปลงสัญญาณ Dante แบบส่งออก 2 ช่องสัญญาณ|155,240|11636|
+11625|rjd1112-0050|RJD1112-0050 – หัวแปลงสัญญาณ Dante แบบส่งออก 1 ช่องสัญญาณ|155,240|11635|
+16436|aph-audio-cable-ethernet-5m|APH Audio Cable Ethernet 5m|101|0|
+16435|aph-audio-cable-speakon-10m|APH Audio Cable Speakon 10m|101|0|
+16434|aph-audio-cable-rca-pair-2m|APH Audio Cable RCA Pair 2m|101|0|
+16433|aph-audio-cable-1-4-ts-5m|APH Audio Cable 1/4" TS 5m|101|0|
+16432|aph-audio-cable-xlr-3m|APH Audio Cable XLR 3m|101|0|
+16003|xlrnet-ip65-range-vuueb|XLRnet IP65 Range – VUUEB|140|19782|
+15987|xlrnet-ip65-range-ul94v-0|XLRnet IP65 Range – UL94V-0|140|18513|
+15963|xlrnet-ip65-range-ip54|XLRnet IP65 Range – IP54|140|21180|
+15961|xlrnet-ip65-range-hryeb|XLRnet IP65 Range – HRYEB|140|21179|
+15960|xlrnet-ip65-range-hryb|XLRnet IP65 Range – HRYB|140|21179|
+15959|xlrnet-ip65-range-hrreb|XLRnet IP65 Range – HRREB|140|21179|
+15958|xlrnet-ip65-range-hrrb|XLRnet IP65 Range – HRRB|140|21179|
+15957|xlrnet-ip65-range-hrgeb|XLRnet IP65 Range – HRGEB|140|21179|
+15956|xlrnet-ip65-range-hrgb|XLRnet IP65 Range – HRGB|140|21179|
+15953|xlrnet-ip65-range-hgyeb|XLRnet IP65 Range – HGYEB|140|21179|
+15952|xlrnet-ip65-range-hgyb|XLRnet IP65 Range – HGYB|140|21179|
+15951|xlrnet-ip65-range-hgreb|XLRnet IP65 Range – HGREF|140|21179|
+15950|xlrnet-ip65-range-hgrb|XLRnet IP65 Range – HGRB|140|21179|
+15929|xlrnet-ip65-range-rjxs|XLRnet IP65 Range – RJXS|140|21180|
+15928|xlrnet-ip65-range-rjxs8fg6vb|XLRnet IP65 Range – RJXS8FG6VB|140|18822|
+15927|xlrnet-ip65-range-rjxs8fg6i|XLRnet IP65 Range – RJXS8FG6I|140|19765|
+15926|xlrnet-ip65-range-rjxs8fg6hb|XLRnet IP65 Range – RJXS8FG6HB|140|18822|
+16918|iec268|IEC268|105|19868|
+16917|pi539|PI539|105|19869|
+16895|ip40|IP40|140,138,105|18000|
+11943|ac3fa|AC3FA|86,105|0|https://www.aph-ita.co.th/wp-content/uploads/2026/08/AC3F-1.jpg
+11944|ac3fah|AC3FAH|86,105|0|https://www.aph-ita.co.th/wp-content/uploads/2026/08/AC3FAH-2.jpg
+11945|ac3fah-au-pre|AC3FAH-AU-PRE|86,105|0|https://www.aph-ita.co.th/wp-content/uploads/2026/08/AC3F-1.jpg
+11946|ac3fah1|AC3FAH1|86,105|0|https://www.aph-ita.co.th/wp-content/uploads/2026/08/AC3FAH-2.jpg
+11947|ac3fah1-au-pre|AC3FAH1-AU-PRE|86,105|0|https://www.aph-ita.co.th/wp-content/uploads/2026/08/AC3FAH-2.jpg

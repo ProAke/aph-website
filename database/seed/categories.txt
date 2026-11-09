@@ -1,0 +1,49 @@
+# id|parent|slug|name|sort
+105|0|xlr|XLR|1
+86|105|ac-series-cable-connectors|AC Series (Cable Connectors)|1
+148|105|ax-series-cable-connectors|AX Series (Cable Connectors)|2
+84|105|ac-z-series-d-type|AC "Z" Series (D Type)|3
+83|105|ac-series-a-and-b-type|AC Series (A and B Type)|4
+268|105|ac-dual-1-4-xlr-c-type|AC Dual - 1/4" / XLR (C Type)|5
+262|105|ac-z-series-p-and-pn-type|AC "Z" Series (P and PN Type)|6
+147|105|ax-series-chassis-mounts|AX Series (Chassis Mounts)|7
+146|105|ip65-series-chassis-mounts|IP65 Series (Chassis Mounts)|8
+140|0|ethernet|Ethernet|2
+195|140|xlrnet|XLRnet|1
+157|140|xlrnet-series-a-b-type|XLRnet (A and B Type)|2
+158|140|xlrnet-series-d-type|XLRnet (D Type)|3
+154|140|xlrnet-ip65|XLRnet IP65 (Chassis Mounts)|4
+138|0|loudspeaker|Loudspeaker|3
+149|138|sp-series-cable-connector|SP Series Loudspeaker Cable Connectors|1
+150|138|ep-series-metal-shell-cable|EP Series Metal Shell Loudspeaker Cable Connectors|2
+151|138|ap-series-thermoplastic-cable|AP Series Thermoplastic Shell Loudspeaker Cable Connectors|3
+221|138|sp-series-loudspeaker-chassis-mounts|SP Series Loudspeaker Chassis Mounts|4
+236|138|ep-series-metal-shell-loudspeaker-chassis-mounts|EP Series Metal Shell Loudspeaker Chassis Mounts|5
+237|138|ap-series-thermoplastic-shell-loudspeaker-chassis-mounts|AP Series Thermoplastic Shell Loudspeaker Chassis Mounts|6
+234|138|d-shell-adapters-loudspeaker-accessories|D Shell Adapters Loudspeaker Accessories|7
+145|0|multipin|Multipin|4
+167|145|mp-41-series|MP-41 Series|1
+168|145|mp-62-65-series|MP-62/65 Series|2
+142|0|1-4-3-5mm|1/4" & 3.5mm|5
+163|142|k-series-3-5mm-plugs|K Series (3.5mm Plugs)|1
+243|142|m-series-single|M Series (Single) 1/4" Jacks|2
+244|142|m-series-dual|M Series (Dual) 1/4" Jacks|3
+162|142|m-series-musician-range|M Series Musician Range 1/4" Plugs|4
+161|142|m-series-ii-musician-range|M Series II Musician Range 1/4" Plugs|5
+242|142|q-series-1-4-plugs|Q Series 1/4" Plugs|6
+159|142|t-series-switchplug|T Series SwitchPlug 1/4" Plugs|7
+164|142|t-series-professional-range|T Series Professional Range 1/4" Plugs|8
+160|142|t-series-jumbo-cable-range|T Series Jumbo Cable Range 1/4" Plugs|9
+143|0|rca|RCA|6
+165|143|m-series-musician-range-rca-cable-connectors|M Series Musician Range RCA Cable Connectors|1
+246|143|m-series-d-type-rca-chassis-mounts|M Series D Type RCA Chassis Mounts|2
+144|0|mini-xlr|Mini XLR|7
+166|144|g-type-mini-xlr-cable-connectors|G Type Mini XLR Cable Connectors|1
+247|144|g-type-mini-xlr-chassis-mounts|G Type Mini XLR Chassis Mounts|2
+139|0|power|Power|8
+152|139|hp-series|HP Series|1
+153|139|hpt-series|HPT Series|2
+240|0|dante|Dante™|9
+155|240|amphe-dante-adapters|Amphe-Dante Adapters|1
+141|0|data|Data|10
+101|0|aph-auido-cable|APH Audio Cable|11

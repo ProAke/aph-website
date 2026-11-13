@@ -20,7 +20,8 @@
     "parity": "node scripts/parity-check.mjs",
     "edge:gen": "node scripts/gen-edge-rules.mjs",
     "sync:health": "node scripts/sync-health.mjs",
-    "check:staging": "node scripts/check-staging.mjs"
+    "check:staging": "node scripts/check-staging.mjs",
+    "vhost:gen": "node scripts/gen-vhost.mjs"
   },
   "dependencies": {
     "mysql2": "^3.24.6",

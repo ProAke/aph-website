@@ -1,0 +1,40 @@
+# Run several Nuxt instances side by side — one per sub-domain / canary slot.
+#
+#   sudo cp deploy/systemd/aph-nuxt@.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now aph-nuxt@3000      # new.aph-ita.co.th
+#   sudo systemctl enable --now aph-nuxt@3010      # beta.aph-ita.co.th (second instance)
+#
+# Environment files: /etc/aph/aph-nuxt-3000.env, /etc/aph/aph-nuxt-3010.env …
+# (each one only overrides what differs: NUXT_PUBLIC_SITE_URL, NUXT_PUBLIC_ROBOTS_NOINDEX …)
+[Unit]
+Description=APH Nuxt SSR (port %i)
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aph
+Group=aph
+WorkingDirectory=/srv/aph
+EnvironmentFile=/etc/aph/aph-nuxt-%i.env
+Environment=NODE_ENV=production
+Environment=PORT=%i
+Environment=NITRO_PORT=%i
+# the shared defaults (DB credentials, legacy origin, analytics IDs)
+EnvironmentFile=/etc/aph/aph-common.env
+ExecStart=/usr/bin/node .output/server/index.mjs
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=20
+# keep memory predictable; a runaway SSR render must not take the box down
+MemoryMax=1500M
+LimitNOFILE=65535
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aph-nuxt
+
+[Install]
+WantedBy=multi-user.target

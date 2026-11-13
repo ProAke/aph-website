@@ -13,6 +13,7 @@ onMounted(() => init())
 // switch-over does not create a data gap or a "new site" signal.
 const cfg = useRuntimeConfig().public
 useHead({
+  meta: cfg.robotsNoindex ? [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] : [],
   script: [
     cfg.gtmId && {
       hid: 'gtm',

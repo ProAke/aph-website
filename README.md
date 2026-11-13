@@ -112,7 +112,9 @@ layouts/default.vue        header + footer + cart drawer + toast + scroll-to-top
 pages/                     index, products, product-category/[...slug], product/[slug],
                            search, articles, catalogs, dealers, about, contact, cart, checkout
 server/api/                Nitro endpoints
-server/middleware/         legacy-compat.ts — trailing slash, ?s=, ?add-to-cart, /wp-admin passthrough
+plugins/                   canonical.ts — one canonical per page + private-page noindex
+server/middleware/         legacy-compat.ts, seo-guard.ts (staging noindex), trailing slash, ?s=, ?add-to-cart
+server/plugins/            legacy-origin-guard.ts — warns at boot if NUXT_LEGACY_ORIGIN is missing
 server/routes/             sitemap.xml, sitemap_index.xml, robots.txt, wp-content/uploads proxy
 server/utils/              db.ts (mysql2 pool + health probe), store-sql.ts, store-json.ts, repo.ts
 server/data/catalog.json   bundled snapshot (source for the JSON fallback)
@@ -200,13 +202,30 @@ is fed from it, and the cut-over is a single routing decision at the edge.
 | Phase | When | Command / artifact |
 | --- | --- | --- |
 | 0 · Baseline + freeze | T−3 weeks | snapshot WP DB/files, GA4 + Search Console baseline |
-| 1 · Staging (private, noindex) | T−2 weeks | `npm run import:wp:full` on `new.aph-ita.co.th` |
+| 1 · Staging sub-domain (private, noindex) | T−2 weeks | `deploy/nginx/subdomain.conf` + `npm run check:staging` — see [docs/SUBDOMAIN-SETUP.md](docs/SUBDOMAIN-SETUP.md) |
 | 2 · Delta sync every 5 min | from phase 1 | `npm run sync` (cron), `npm run sync:health` (alerting) |
 | 3 · Parity + UAT | T−1 week | `npm run parity -- --old … --new … --limit 400` |
 | 4 · Canary 1 → 5 → 25 → 50 → 100 % | T−1 day | `npm run edge:gen -- --rollout 5` + `nginx -s reload` |
 | 5 · Cut-over runbook | T0 | `npm run sync -- --full` → parity → `--rollout 100` |
 | 6 · Rollback (rehearsed) | any time | `npm run edge:gen -- --rollout 0` (< 1 s) |
 | 7 · Post-cutover / decommission | T+1 … T+30 | drop `NUXT_LEGACY_ORIGIN` after WordPress is retired |
+
+### Staging on a sub-domain (`new.aph-ita.co.th`)
+
+A sub-domain is the safe place to *rehearse* the cut-over — it is **not** the cut-over itself: serving real
+visitors there would change the URL, split cookies/cart sessions and split SEO authority.
+The repo ships the vhost, the guard and a checker:
+
+```bash
+sudo cp deploy/nginx/subdomain.conf /etc/nginx/sites-available/new.aph-ita.co.th
+sudo certbot --nginx -d new.aph-ita.co.th --redirect
+NUXT_PUBLIC_ROBOTS_NOINDEX=1 npm run build        # X-Robots-Tag + meta robots + robots.txt
+npm run check:staging -- --url https://new.aph-ita.co.th --auth aph:secret
+```
+
+`NUXT_PUBLIC_ROBOTS_NOINDEX=1` is a three-layer guard (header, meta tag, `Disallow: /`), so a
+half-finished staging build can never compete with the live WordPress site.
+Read the trade-offs: **[docs/SUBDOMAIN-SETUP.md](docs/SUBDOMAIN-SETUP.md)**.
 
 ### What makes the switch invisible
 
@@ -220,6 +239,7 @@ is fed from it, and the cut-over is a single routing decision at the edge.
 | `฿0.00` price rendering | `NUXT_PUBLIC_ZERO_PRICE_STYLE=woo` for the cut-over window |
 | GTM / GA4 | same container & property injected from env — no data gap |
 | Sitemap URL set | `/sitemap.xml` + `/sitemap_index.xml` generated from the DB |
+| Canonical tags | `plugins/canonical.ts` — absolute, always the production host (even on the staging sub-domain), WooCommerce-style noindex for `/cart`, `/checkout`, `/search` |
 
 ### Day-of commands
 

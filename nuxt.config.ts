@@ -58,7 +58,10 @@ export default defineNuxtConfig({
       gaId: process.env.NUXT_PUBLIC_GA_ID || '',
       // 'quote' (default) = show “สอบถามราคา” for 0.00 prices
       // 'woo'   = render ฿0.00 exactly like WooCommerce (max visual parity on cut-over day)
-      zeroPriceStyle: process.env.NUXT_PUBLIC_ZERO_PRICE_STYLE || 'quote'
+      zeroPriceStyle: process.env.NUXT_PUBLIC_ZERO_PRICE_STYLE || 'quote',
+      // Staging subdomain guard: NUXT_PUBLIC_ROBOTS_NOINDEX=1 keeps every search engine out
+      // (X-Robots-Tag + meta robots + robots.txt) until the real cut-over.
+      robotsNoindex: process.env.NUXT_PUBLIC_ROBOTS_NOINDEX === '1'
     }
   },
 

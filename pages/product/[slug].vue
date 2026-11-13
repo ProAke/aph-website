@@ -118,7 +118,7 @@
 import type { ProductDetail, ProductCard } from '~/server/utils/types'
 
 const route = useRoute()
-const slug = computed(() => String(route.params.slug))
+const slug = computed(() => String(route.params.slug || '').replace(/\/+$/, ''))
 
 const { data, error } = await useFetch<{ product: ProductDetail; related: ProductCard[] }>(
   () => `/api/products/${slug.value}`

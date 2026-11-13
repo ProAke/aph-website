@@ -124,6 +124,11 @@ export const jsonStore: Store = {
     return row ? toDetail(row) : null
   },
 
+  async productById(id: number) {
+    const row = data.products.find((p) => p.id === id)
+    return row ? toDetail(row) : null
+  },
+
   async relatedProducts(p: ProductDetail, limit = 5) {
     const row = data.products.find((r) => r.id === p.id)
     if (!row) return []

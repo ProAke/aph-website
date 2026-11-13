@@ -102,7 +102,16 @@ npm run import:wp:full                 # ดึงทั้งหมด + โห
 npm run build && node .output/server/index.mjs
 ```
 
-- เปิด `new.aph-ita.co.th` แบบ **Basic Auth** และ **`noindex`** (ตั้ง `x-robots-tag: noindex` ที่ nginx) — ห้ามให้ Google เห็นก่อนเวลา
+- เปิด `new.aph-ita.co.th` แบบ **Basic Auth** และ **`noindex`** — ห้ามให้ Google เห็นก่อนเวลา
+  ```bash
+  sudo cp deploy/nginx/subdomain.conf /etc/nginx/sites-available/new.aph-ita.co.th
+  sudo ln -s /etc/nginx/sites-available/new.aph-ita.co.th /etc/nginx/sites-enabled/
+  sudo certbot --nginx -d new.aph-ita.co.th --redirect
+  sudo htpasswd -c /etc/nginx/.htpasswd-aph aph      # แล้วเปิด auth_basic ใน config
+  # .env ของ staging: NUXT_PUBLIC_ROBOTS_NOINDEX=1  (X-Robots-Tag + meta robots + robots.txt)
+  npm run check:staging -- --url https://new.aph-ita.co.th --auth aph:secret
+  ```
+  รายละเอียด + ข้อดีข้อเสียของการใช้ sub-domain (และทำไมไม่ควรใช้เป็นทางขึ้นจริง): **[docs/SUBDOMAIN-SETUP.md](SUBDOMAIN-SETUP.md)**
 - `.env` ของ staging ต้องมี `NUXT_LEGACY_ORIGIN=https://www.aph-ita.co.th` เพื่อให้ `/wp-content/uploads/...` ทำงาน
 - ตรวจ 20 หน้าหลักด้วยตาเปล่า + `npm run parity -- --new https://new.aph-ita.co.th --no-old`
 

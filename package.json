@@ -19,7 +19,8 @@
     "sync:watch": "node scripts/sync-wordpress.mjs --max-runtime=300",
     "parity": "node scripts/parity-check.mjs",
     "edge:gen": "node scripts/gen-edge-rules.mjs",
-    "sync:health": "node scripts/sync-health.mjs"
+    "sync:health": "node scripts/sync-health.mjs",
+    "check:staging": "node scripts/check-staging.mjs"
   },
   "dependencies": {
     "mysql2": "^3.24.6",

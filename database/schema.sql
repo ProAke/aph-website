@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS products (
   datasheet_url     VARCHAR(512) NULL,
   specs             JSON NULL,
   wp_permalink      VARCHAR(512) NULL,
+  wp_modified       DATETIME NULL,
+  wp_status         VARCHAR(20) NOT NULL DEFAULT 'publish',
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -76,7 +78,10 @@ CREATE TABLE IF NOT EXISTS posts (
   category     VARCHAR(120) NULL,
   author       VARCHAR(120) NULL DEFAULT 'admin',
   kind         ENUM('news','article') NOT NULL DEFAULT 'news',
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
   published_at DATETIME NULL,
+  wp_modified  DATETIME NULL,
+  wp_status    VARCHAR(20) NOT NULL DEFAULT 'publish',
   PRIMARY KEY (id),
   UNIQUE KEY uq_posts_slug (slug),
   KEY idx_posts_kind (kind, published_at)
@@ -145,6 +150,13 @@ CREATE TABLE IF NOT EXISTS order_items (
   PRIMARY KEY (id),
   KEY idx_oi_order (order_id),
   CONSTRAINT fk_oi_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sync_state (
+  `key`       VARCHAR(120) NOT NULL,
+  `value`     VARCHAR(255) NULL,
+  updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS import_runs (

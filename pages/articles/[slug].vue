@@ -46,7 +46,7 @@
 import type { Post } from '~/server/utils/types'
 
 const route = useRoute()
-const { data, error } = await useFetch<{ post: Post; related: Post[] }>(() => `/api/posts/${route.params.slug}`)
+const { data, error } = await useFetch<{ post: Post; related: Post[] }>(() => `/api/posts/${String(route.params.slug || '').replace(/\/+$/, '')}`)
 if (error.value) throw createError({ statusCode: 404, statusMessage: 'ไม่พบบทความนี้', fatal: true })
 
 const post = computed(() => data.value?.post)

@@ -21,9 +21,12 @@
 import type { CategoryNode } from '~/server/utils/types'
 
 const route = useRoute()
+// WordPress canonicals end with "/" — Vue Router's catch-all keeps an empty trailing
+// segment for those URLs, so normalise here instead of redirecting (address bar stays as-is).
 const path = computed(() => {
-  const s = route.params.slug
-  return Array.isArray(s) ? s.join('/') : String(s || '')
+  const raw = route.params.slug
+  const joined = Array.isArray(raw) ? raw.join('/') : String(raw || '')
+  return joined.split('/').filter(Boolean).join('/')
 })
 
 const { data: boot } = await useBootstrap()

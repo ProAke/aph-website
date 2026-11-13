@@ -72,6 +72,7 @@ export interface Store {
   categoryByPath(path: string): Promise<CategoryNode | null>
   listProducts(q: ProductQuery): Promise<Paginated<ProductCard>>
   productBySlug(slug: string): Promise<ProductDetail | null>
+  productById(id: number): Promise<ProductDetail | null>
   relatedProducts(p: ProductDetail, limit?: number): Promise<ProductCard[]>
   posts(opts?: { kind?: 'news' | 'article'; limit?: number }): Promise<Post[]>
   postBySlug(slug: string): Promise<Post | null>

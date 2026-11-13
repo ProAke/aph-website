@@ -14,8 +14,18 @@ export function useBootstrap() {
   })
 }
 
-export const THB = (n: number) =>
-  n > 0 ? '฿' + n.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'สอบถามราคา'
+/**
+ * WooCommerce prints ฿0.00 for products without a price; the redesign shows “สอบถามราคา”.
+ * On cut-over day set NUXT_PUBLIC_ZERO_PRICE_STYLE=woo to keep the exact old rendering,
+ * then flip it back to 'quote' after the migration window.
+ */
+export const THB = (n: number) => {
+  const style = String(useRuntimeConfig().public.zeroPriceStyle || 'quote')
+  if (n > 0 || style === 'woo') {
+    return '฿' + n.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+  return 'สอบถามราคา'
+}
 
 export const thaiDate = (d?: string | null) =>
   d ? new Date(d.replace(' ', 'T')).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : ''

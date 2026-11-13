@@ -87,6 +87,19 @@ const toCard = (r: Row): ProductCard => ({
   image: r.image_url || null, categories: [], shortDescription: r.short_description || null
 })
 
+async function toDetail(r: Row): Promise<ProductDetail> {
+  const images = await query<Row>('SELECT url FROM product_images WHERE product_id = ? ORDER BY position, id', [r.id])
+  const [card] = await attachCategories([toCard(r)])
+  return {
+    ...card,
+    description: r.description || null,
+    images: images.map((i) => i.url),
+    datasheetUrl: r.datasheet_url || null,
+    wpPermalink: r.wp_permalink || null,
+    specs: { SKU: r.sku, Series: card.categories[0]?.name || '' } as Record<string, string>
+  }
+}
+
 const ORDER: Record<string, string> = {
   'newest': 'p.id DESC',
   'name-asc': 'p.name ASC',
@@ -154,18 +167,17 @@ export const sqlStore: Store = {
       [slug]
     )
     if (!rows.length) return null
-    const r = rows[0]
-    const images = await query<Row>('SELECT url FROM product_images WHERE product_id = ? ORDER BY position, id', [r.id])
-    const [card] = await attachCategories([toCard(r)])
-    const product: ProductDetail = {
-      ...card,
-      description: r.description || null,
-      images: images.map((i) => i.url),
-      datasheetUrl: r.datasheet_url || null,
-      wpPermalink: r.wp_permalink || null,
-      specs: { SKU: r.sku, Series: card.categories[0]?.name || '' } as Record<string, string>
-    }
-    return product
+    return toDetail(rows[0])
+  },
+
+  async productById(id: number) {
+    const rows = await query<Row>(
+      `SELECT p.*, (SELECT url FROM product_images i WHERE i.product_id = p.id ORDER BY i.position, i.id LIMIT 1) AS image_url
+       FROM products p WHERE p.id = ? AND p.is_published = 1 LIMIT 1`,
+      [id]
+    )
+    if (!rows.length) return null
+    return toDetail(rows[0])
   },
 
   async relatedProducts(p: ProductDetail, limit = 5) {
@@ -184,7 +196,7 @@ export const sqlStore: Store = {
   },
 
   async posts(opts: { kind?: 'news' | 'article'; limit?: number } = {}) {
-    const where = opts.kind ? 'WHERE kind = ?' : ''
+    const where = opts.kind ? 'WHERE is_published = 1 AND kind = ?' : 'WHERE is_published = 1'
     const params: unknown[] = opts.kind ? [opts.kind] : []
     const rows = await query<Row>(
       `SELECT id, slug, title, excerpt, image_url, category, kind, published_at, content FROM posts ${where}
@@ -198,7 +210,7 @@ export const sqlStore: Store = {
   },
 
   async postBySlug(slug: string) {
-    const rows = await query<Row>('SELECT * FROM posts WHERE slug = ? LIMIT 1', [slug])
+    const rows = await query<Row>('SELECT * FROM posts WHERE slug = ? AND is_published = 1 LIMIT 1', [slug])
     if (!rows.length) return null
     const p = rows[0]
     return {

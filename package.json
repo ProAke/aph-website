@@ -12,7 +12,14 @@
     "db:seed": "node scripts/db-seed.mjs",
     "db:reset": "node scripts/db-init.mjs --reset",
     "import:wp": "node scripts/import-wordpress.mjs",
-    "import:wp:full": "node scripts/import-wordpress.mjs --images --dump-json"
+    "import:wp:full": "node scripts/import-wordpress.mjs --images --dump-json",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "sync": "node scripts/sync-wordpress.mjs",
+    "sync:full": "node scripts/sync-wordpress.mjs --full",
+    "sync:watch": "node scripts/sync-wordpress.mjs --max-runtime=300",
+    "parity": "node scripts/parity-check.mjs",
+    "edge:gen": "node scripts/gen-edge-rules.mjs",
+    "sync:health": "node scripts/sync-health.mjs"
   },
   "dependencies": {
     "mysql2": "^3.24.6",

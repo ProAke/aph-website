@@ -43,7 +43,23 @@ export default defineNuxtConfig({
       database: process.env.NUXT_DB_NAME || 'aph_website'
     },
     // set APH_DATA_SOURCE=json to force the bundled snapshot (no database)
-    dataSource: process.env.APH_DATA_SOURCE || 'auto'
+    dataSource: process.env.APH_DATA_SOURCE || 'auto',
+
+    // Origin of the still-running WordPress site. Used by the compatibility layer for
+    // /wp-admin, /wp-json, /my-account, /wishlist, /compare and for old /wp-content/uploads files.
+    // Keep it set until WordPress is decommissioned, then remove it.
+    legacyOrigin: process.env.NUXT_LEGACY_ORIGIN || '',
+
+    public: {
+      // canonical origin (used by sitemap.xml, robots.txt, canonical tags, OG URLs)
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.aph-ita.co.th',
+      // analytics continuity: no re-tagging day, no data gap
+      gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
+      gaId: process.env.NUXT_PUBLIC_GA_ID || '',
+      // 'quote' (default) = show “สอบถามราคา” for 0.00 prices
+      // 'woo'   = render ฿0.00 exactly like WooCommerce (max visual parity on cut-over day)
+      zeroPriceStyle: process.env.NUXT_PUBLIC_ZERO_PRICE_STYLE || 'quote'
+    }
   },
 
   nitro: {

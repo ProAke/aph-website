@@ -65,6 +65,9 @@ async function paginate(path, { onPage } = {}) {
   return out
 }
 
+// WooCommerce Store API returns integer minor units (1299 = ฿12.99)
+const money = (prices, key = 'price') => Number(prices?.[key] || 0) / 10 ** Number(prices?.currency_minor_unit ?? 2)
+
 const stripHtml = (html = '') =>
   html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim()
 
@@ -136,7 +139,7 @@ async function main() {
             Number(p.id), p.slug, p.name, p.sku || p.name,
             stripHtml(p.short_description || ''),
             p.description || p.short_description || '',
-            Number(p.prices?.price || 0), Number(p.prices?.regular_price || 0),
+            money(p.prices, 'price'), money(p.prices, 'regular_price'),
             p.prices?.currency_code || 'THB',
             p.is_in_stock ? 1 : 0, p.on_sale ? 1 : 0,
             Number(p.average_rating || 0), Number(p.review_count || 0), p.permalink || null

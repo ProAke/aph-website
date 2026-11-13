@@ -18,6 +18,7 @@ layout / UX / UI and the product catalogue.
 | Database | MariaDB 11 schema (`database/schema.sql`) + generated seed (`database/seed.sql`) + importer that clones the **whole live catalogue** |
 | Cart | Client cart with slide-over drawer, quantity control and a checkout that writes to MariaDB (`orders` / `order_items`) |
 | Data snapshot | `server/data/catalog.json` — 207 real products / 48 categories / 7 posts harvested from the live site, used automatically when MariaDB is not reachable |
+| Migration tooling | Delta sync, parity checker, edge canary router (nginx + Cloudflare) and an app-level WordPress compatibility layer — see [§6](#6-zero-downtime-migration-wordpress-stays-live) |
 
 ### Design/UX elements cloned from the original
 * Dark navy top bar (phone, e-mail, opening hours, LINE) → white sticky header with search + cart.
@@ -111,6 +112,8 @@ layouts/default.vue        header + footer + cart drawer + toast + scroll-to-top
 pages/                     index, products, product-category/[...slug], product/[slug],
                            search, articles, catalogs, dealers, about, contact, cart, checkout
 server/api/                Nitro endpoints
+server/middleware/         legacy-compat.ts — trailing slash, ?s=, ?add-to-cart, /wp-admin passthrough
+server/routes/             sitemap.xml, sitemap_index.xml, robots.txt, wp-content/uploads proxy
 server/utils/              db.ts (mysql2 pool + health probe), store-sql.ts, store-json.ts, repo.ts
 server/data/catalog.json   bundled snapshot (source for the JSON fallback)
 database/schema.sql        MariaDB schema
@@ -119,6 +122,14 @@ scripts/build-dataset.mjs  txt → catalog.json + seed.sql
 scripts/db-init.mjs        CREATE DATABASE + apply schema   (npm run db:init)
 scripts/db-seed.mjs        load seed.sql                    (npm run db:seed)
 scripts/import-wordpress.mjs  full WordPress → MariaDB importer
+scripts/sync-wordpress.mjs    incremental delta sync (watermarks, soft-deletes, image mirror)
+scripts/sync-health.mjs       freshness probe for monitoring/cron alerts
+scripts/parity-check.mjs      old-vs-new URL parity checker (status/title/h1/text similarity)
+scripts/gen-edge-rules.mjs    generates the edge canary config for a given rollout %
+scripts/db-migrate.mjs        applies database/migrations/*.sql (idempotent)
+deploy/nginx/aph-edge.conf    WordPress ⇄ Nuxt router with automatic fallback + instant rollback
+deploy/cloudflare/worker.js   same router as a Cloudflare Worker
+docs/MIGRATION-ZERO-DOWNTIME.md  full runbook (Thai)
 docker-compose.yml         MariaDB 11 with utf8mb4 + healthcheck
 ```
 
@@ -147,11 +158,85 @@ about the source.
 | `GET /api/catalogs` · `GET /api/dealers` | PDF catalogues, dealer list |
 | `POST /api/orders` | create order (validates name/phone, writes `orders` + `order_items`) |
 | `POST /api/contact` | contact form (logs to server console; wire to SMTP/CRM) |
+| `GET /api/products/by-id/:id` | used by the compatibility layer for old `?add-to-cart=<id>` links |
 | `GET /api/health` | `{ ok, dataSource }` |
+
+Non-API routes that keep the migration invisible:
+`/sitemap.xml`, `/sitemap_index.xml` (same URL set as Yoast), `/robots.txt`,
+`/wp-content/uploads/**` (served from the local mirror or proxied to the legacy origin).
 
 ---
 
-## 6. Production
+## 6. Zero-downtime migration (WordPress stays live)
+
+The rewrite is **not** a big-bang switch. WordPress keeps serving production while the new stack
+is fed from it, and the cut-over is a single routing decision at the edge.
+
+```
+                 ┌───────────────────────────────┐
+ user / Google → │ Edge (nginx or Cloudflare)    │  one knob: --rollout 0…100
+                 │ sticky cookie · 5xx → WP      │  rollback < 1 second
+                 └───────┬───────────────┬───────┘
+                  rollout│               │rest
+                         ▼               ▼
+              Nuxt 3 :3000  ⇠sync 5min⇢  WordPress + MySQL (untouched)
+                         │
+                         ▼
+                  MariaDB «aph_website» (new)
+```
+
+**Six rules** (details + runbook in **[docs/MIGRATION-ZERO-DOWNTIME.md](docs/MIGRATION-ZERO-DOWNTIME.md)**):
+
+1. WordPress is the source of truth until T0 — data only ever flows *into* MariaDB via the REST API.
+2. The production WordPress database is never touched (no direct MySQL access, read-only REST).
+3. One switch (`$aph_rollout`) decides the split; no DNS shuffling, no config drift.
+4. Every existing URL/behaviour keeps working (`/product/x/`, `?s=`, `?add-to-cart=`, `/wp-content/uploads/…`).
+5. Every step is reversible in under a minute; idempotent GETs fall back to WordPress on 5xx,
+   POSTs never do (no double orders).
+6. Go/No-Go is decided by numbers: parity diff ≤ 5 %, zero FAILs, 5xx ≤ baseline, conversion ±5 %.
+
+### Phases
+
+| Phase | When | Command / artifact |
+| --- | --- | --- |
+| 0 · Baseline + freeze | T−3 weeks | snapshot WP DB/files, GA4 + Search Console baseline |
+| 1 · Staging (private, noindex) | T−2 weeks | `npm run import:wp:full` on `new.aph-ita.co.th` |
+| 2 · Delta sync every 5 min | from phase 1 | `npm run sync` (cron), `npm run sync:health` (alerting) |
+| 3 · Parity + UAT | T−1 week | `npm run parity -- --old … --new … --limit 400` |
+| 4 · Canary 1 → 5 → 25 → 50 → 100 % | T−1 day | `npm run edge:gen -- --rollout 5` + `nginx -s reload` |
+| 5 · Cut-over runbook | T0 | `npm run sync -- --full` → parity → `--rollout 100` |
+| 6 · Rollback (rehearsed) | any time | `npm run edge:gen -- --rollout 0` (< 1 s) |
+| 7 · Post-cutover / decommission | T+1 … T+30 | drop `NUXT_LEGACY_ORIGIN` after WordPress is retired |
+
+### What makes the switch invisible
+
+| Behaviour | How it is preserved |
+| --- | --- |
+| `/product/ac3fa/` (trailing slash) | `server/middleware/legacy-compat.ts` rewrites internally — no redirect, URL bar unchanged |
+| `/?s=keyword` | 302 → `/search?q=keyword` |
+| `/?add-to-cart=11943` | 302 → that product page (lookup via `/api/products/by-id/:id`) |
+| `/wp-content/uploads/…` | local mirror first, then proxied to `NUXT_LEGACY_ORIGIN` |
+| `/my-account`, `/wishlist`, `/compare`, `/wp-admin`, `/wp-json` | stay on WordPress until decommissioned |
+| `฿0.00` price rendering | `NUXT_PUBLIC_ZERO_PRICE_STYLE=woo` for the cut-over window |
+| GTM / GA4 | same container & property injected from env — no data gap |
+| Sitemap URL set | `/sitemap.xml` + `/sitemap_index.xml` generated from the DB |
+
+### Day-of commands
+
+```bash
+npm run sync -- --full                        # close the last 5-minute gap
+npm run parity -- --limit 400                 # FAIL must be 0
+npm run edge:gen -- --rollout 100             # cut over
+curl -sI https://www.aph-ita.co.th/ | grep -i x-aph    # which stack served you?
+npm run edge:gen -- --rollout 0               # rollback, < 1 second
+```
+
+> Cannot run it here? `scripts/sync-wordpress.mjs` and `scripts/parity-check.mjs` need network access to
+> `aph-ita.co.th`; both are safe to dry-run (`--dry-run`, `--no-old`) and neither writes to WordPress.
+
+---
+
+## 7. Production
 
 ```bash
 npm run build
@@ -171,7 +256,7 @@ APH_DATA_SOURCE=auto
 
 ---
 
-## 7. Status & known limitations
+## 8. Status & known limitations
 
 * **Products:** 207 of ≈ 800 SKUs are included as real data in this repo (names, SKUs, category
   membership, images, Thai descriptions derived from the series copy). Run
@@ -214,6 +299,24 @@ npm run import:wp:full   # เพิ่มดาวน์โหลดรูป�
 * ค้นหา, บทความ/ข่าวสาร, แคตตาล็อก PDF, ตัวแทนจำหน่าย, เกี่ยวกับเรา, ติดต่อเรา, ตะกร้า, ชำระเงิน
 * API ฝั่งเซิร์ฟเวอร์ทั้งหมด และ schema MariaDB (`database/schema.sql`) พร้อม seed (`database/seed.sql`)
 * ข้อมูลจริง 207 SKU / 48 หมวดหมู่ / 7 บทความ ถ้าฐานข้อมูลไม่พร้อม ระบบจะใช้ snapshot อัตโนมัติ (ไม่ล่ม)
+
+### การย้ายระบบแบบไม่ให้เว็บล้ม (Zero-downtime)
+
+WordPress ยังเป็นเว็บจริงตลอดการย้าย — ระบบใหม่ดึงข้อมูลจาก WP ผ่าน REST API ทุก 5 นาที
+แล้วสลับทราฟฟิกที่ **edge (nginx/Cloudflare)** ทีละ 1% → 5% → 25% → 50% → 100% พร้อม **rollback ได้ใน 1 วินาที**
+
+```bash
+npm run sync -- --full      # ปิดช่องว่างข้อมูล 5 นาทีสุดท้าย
+npm run parity -- --limit 400   # ตรวจว่า 400 URL เหมือนเดิม (FAIL ต้องเป็น 0)
+npm run edge:gen -- --rollout 100   # cut-over
+npm run edge:gen -- --rollout 0     # rollback ทันที (< 1 วินาที)
+```
+
+สิ่งที่ทำให้ “ไม่รู้สึกว่าเปลี่ยน”: URL เดิมทุกแบบรวม `/` ปิดท้าย, `?s=`, `?add-to-cart=`,
+`/wp-content/uploads/...`, ฟอนต์/สี/ข้อความเดิม, GTM+GA4 ตัวเดิม, ราคา `฿0.00` แบบเดิม (ตั้ง `NUXT_PUBLIC_ZERO_PRICE_STYLE=woo`)
+และ path ที่ยังไม่ทำใหม่ (`/my-account`, `/wishlist`, `/compare`, `/wp-admin`, `/wp-json`) จะถูกส่งกลับ WordPress อัตโนมัติ
+
+👉 **แผนละเอียด + runbook นาทีต่อนาที + ตารางความเสี่ยง: [docs/MIGRATION-ZERO-DOWNTIME.md](docs/MIGRATION-ZERO-DOWNTIME.md)**
 
 **ข้อควรทราบ**: รูปสินค้าอ้างอิงไฟล์จากเว็บเดิม (ใช้ `--images` เพื่อโหลดมาเก็บในเครื่อง),
 ราคาส่วนใหญ่ต้นฉบับเป็น 0 บาท (ขายแบบใบเสนอราคา) จึงแสดง “สอบถามราคา”,

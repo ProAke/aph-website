@@ -1,0 +1,27 @@
+{
+  "$comment": "Sub-domain map for the WordPress → Nuxt migration. `npm run vhost:gen -- --all` renders one nginx vhost per entry. www stays WordPress until the edge canary reaches 100 %.",
+  "domain": "aph-ita.co.th",
+  "production": {
+    "host": "www.aph-ita.co.th",
+    "serves": "WordPress now → Nuxt after edge cut-over",
+    "port": null
+  },
+  "environments": [
+    {
+      "host": "staging.aph-ita.co.th",
+      "mode": "staging",
+      "port": 3000,
+      "auth": true,
+      "purpose": "ทีม dev/QA ตรวจงานก่อนขึ้น UAT — Basic Auth + noindex",
+      "indexable": false
+    },
+    {
+      "host": "uat.aph-ita.co.th",
+      "mode": "uat",
+      "port": 3010,
+      "auth": false,
+      "purpose": "ให้ลูกค้า/ฝ่ายขายเปิดจากมือถือได้เลย (แชร์ลิงก์) แต่ห้าม Google เห็น",
+      "indexable": false
+    }
+  ]
+}

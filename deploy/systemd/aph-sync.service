@@ -1,0 +1,20 @@
+# Delta sync every 5 minutes — the step that keeps the new DB ≤ 5 min behind WordPress.
+#
+#   sudo cp deploy/systemd/aph-sync.service deploy/systemd/aph-sync.timer /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now aph-sync.timer
+#   systemctl list-timers aph-sync.timer        # next run
+#   journalctl -u aph-sync.service -n 50        # last run
+[Unit]
+Description=APH WordPress → MariaDB delta sync
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=aph
+Group=aph
+WorkingDirectory=/srv/aph
+EnvironmentFile=/etc/aph/aph-common.env
+ExecStart=/usr/bin/npm run sync --silent
+# a failed sync must not spam SMTP; aph-sync-health decides whether to alert
+TimeoutStartSec=600

@@ -9,3 +9,4 @@ public/images/products/*
 !public/images/products/.gitkeep
 deploy/generated/
 reports/
+current-*

@@ -21,7 +21,11 @@
     "edge:gen": "node scripts/gen-edge-rules.mjs",
     "sync:health": "node scripts/sync-health.mjs",
     "check:staging": "node scripts/check-staging.mjs",
-    "vhost:gen": "node scripts/gen-vhost.mjs"
+    "vhost:gen": "node scripts/gen-vhost.mjs",
+    "deploy:staging": "./deploy/deploy.sh --env staging",
+    "deploy:uat": "./deploy/deploy.sh --env uat",
+    "deploy:www": "./deploy/deploy.sh --env www",
+    "db:refresh": "./deploy/refresh-db.sh"
   },
   "dependencies": {
     "mysql2": "^3.24.6",

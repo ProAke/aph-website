@@ -177,6 +177,11 @@ try {
     const map = JSON.parse(await readFile(ENV_FILE, 'utf8'))
     console.log(`→ ${ENV_FILE}: ${map.environments.length} environment(s) under ${map.domain}\n`)
     for (const env of map.environments) {
+      // www is served by the edge router (deploy/nginx/aph-edge.conf), not by a plain vhost
+      if (env.mode === 'production') {
+        console.log(`⏭  ${env.host}: production — served by deploy/nginx/aph-edge.conf (skipped)`)
+        continue
+      }
       if (env.indexable) throw new Error(`${env.host} is marked indexable — a pre-cut-over sub-domain must never be indexable`)
       emitted.push(await emit({ host: env.host, mode: env.mode, port: env.port }))
     }

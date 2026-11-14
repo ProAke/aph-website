@@ -7,6 +7,10 @@
 #
 # Environment files: /etc/aph/aph-nuxt-3000.env, /etc/aph/aph-nuxt-3010.env …
 # (each one only overrides what differs: NUXT_PUBLIC_SITE_URL, NUXT_PUBLIC_ROBOTS_NOINDEX …)
+#
+# WorkingDirectory is a PER-PORT symlink into /srv/aph/releases — that is what makes
+# `deploy/deploy.sh --env staging` deploy only staging. www uses two slots (3020 blue /
+# 3030 green) so a deploy never restarts the slot that is serving live traffic.
 [Unit]
 Description=APH Nuxt SSR (port %i)
 After=network-online.target mariadb.service
@@ -16,14 +20,14 @@ Wants=network-online.target
 Type=simple
 User=aph
 Group=aph
-WorkingDirectory=/srv/aph
+WorkingDirectory=/srv/aph/current-%i
 EnvironmentFile=/etc/aph/aph-nuxt-%i.env
 Environment=NODE_ENV=production
 Environment=PORT=%i
 Environment=NITRO_PORT=%i
 # the shared defaults (DB credentials, legacy origin, analytics IDs)
 EnvironmentFile=/etc/aph/aph-common.env
-ExecStart=/usr/bin/node .output/server/index.mjs
+ExecStart=/usr/bin/node /srv/aph/current-%i/.output/server/index.mjs
 Restart=always
 RestartSec=3
 KillSignal=SIGINT

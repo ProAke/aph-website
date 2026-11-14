@@ -129,9 +129,15 @@ scripts/sync-health.mjs       freshness probe for monitoring/cron alerts
 scripts/parity-check.mjs      old-vs-new URL parity checker (status/title/h1/text similarity)
 scripts/gen-edge-rules.mjs    generates the edge canary config for a given rollout %
 scripts/db-migrate.mjs        applies database/migrations/*.sql (idempotent)
+deploy/environments.json      one host / many host names: port, DB, release paths, indexable flags
+deploy/deploy.sh              atomic per-environment deploy (blue/green on www, auto-rollback)
+deploy/refresh-db.sh          copy the production DB into a sub-domain DB (dry-run by default)
+deploy/install-subdomains.sh  installs all vhosts + certs + systemd instances (dry-run by default)
 deploy/nginx/aph-edge.conf    WordPress ⇄ Nuxt router with automatic fallback + instant rollback
 deploy/cloudflare/worker.js   same router as a Cloudflare Worker
-docs/MIGRATION-ZERO-DOWNTIME.md  full runbook (Thai)
+docs/MIGRATION-ZERO-DOWNTIME.md  full migration runbook (Thai)
+docs/SUBDOMAIN-SETUP.md       staging/uat sub-domains, noindex layers
+docs/DEPLOY-MULTI-DOMAIN.md   deploying several domains from one host (Thai)
 docker-compose.yml         MariaDB 11 with utf8mb4 + healthcheck
 ```
 
@@ -272,7 +278,36 @@ npm run edge:gen -- --rollout 0               # rollback, < 1 second
 
 ---
 
-## 7. Production
+## 7. Deploying several domains from one host
+
+`www` is the parent; `staging` / `uat` are children on the same machine, each with its own port,
+its own database name and its own release symlink — so deploying one never touches the others.
+
+```
+nginx :443 ─┬─ www     → 127.0.0.1:3020 (blue) / :3030 (green)   ← zero-downtime flip
+            ├─ staging → 127.0.0.1:3000  (Basic Auth)
+            └─ uat     → 127.0.0.1:3010  (shared link, noindex)
+
+/srv/aph/current-3020 → /srv/aph/releases/<env>-<utc>-<sha>      (immutable release)
+```
+
+```bash
+./deploy/deploy.sh --env staging            # build + restart :3000
+./deploy/deploy.sh --env uat                # build + restart :3010
+./deploy/deploy.sh --env www                # blue/green: builds the idle slot, then flips nginx
+./deploy/deploy.sh --env staging --rollback # previous release, ~5 s
+./deploy/deploy.sh --env staging --dry-run  # show every command, change nothing
+
+./deploy/refresh-db.sh --to staging --apply --sanitize   # copy prod DB into the staging DB
+```
+
+Every deploy is atomic (new release directory + symlink), health-checked on `/api/health`, and
+**self-rolls-back** when the check fails. Since `NUXT_PUBLIC_*` is runtime config, one build serves all
+environments — only `/etc/aph/aph-nuxt-<port>.env` differs.
+
+Full runbook (bootstrap, sudoers, DB strategy, FAQ): **[docs/DEPLOY-MULTI-DOMAIN.md](docs/DEPLOY-MULTI-DOMAIN.md)**
+
+## 8. Production
 
 ```bash
 npm run build
@@ -292,7 +327,7 @@ APH_DATA_SOURCE=auto
 
 ---
 
-## 8. Status & known limitations
+## 9. Status & known limitations
 
 * **Products:** 207 of ≈ 800 SKUs are included as real data in this repo (names, SKUs, category
   membership, images, Thai descriptions derived from the series copy). Run
@@ -353,6 +388,20 @@ npm run edge:gen -- --rollout 0     # rollback ทันที (< 1 วินา
 และ path ที่ยังไม่ทำใหม่ (`/my-account`, `/wishlist`, `/compare`, `/wp-admin`, `/wp-json`) จะถูกส่งกลับ WordPress อัตโนมัติ
 
 👉 **แผนละเอียด + runbook นาทีต่อนาที + ตารางความเสี่ยง: [docs/MIGRATION-ZERO-DOWNTIME.md](docs/MIGRATION-ZERO-DOWNTIME.md)**
+
+### Deploy หลายโดเมนบนโฮสต์เดียว
+
+`www` เป็นแม่, `staging`/`uat` เป็นลูก — คนละ port, คนละชื่อฐานข้อมูล, คนละ release symlink จึง deploy แยกกันได้จริง
+
+```bash
+./deploy/deploy.sh --env staging       # build + restart :3000
+./deploy/deploy.sh --env www           # blue/green: build ฝั่งว่าง → ตรวจ → สลับ nginx (ไม่มี request หลุด)
+./deploy/deploy.sh --env staging --rollback   # ย้อนกลับใน ~5 วินาที
+./deploy/refresh-db.sh --to staging --apply   # คัดลอก DB prod ลง staging (มี --sanitize)
+```
+ทุกครั้งที่ deploy: release ใหม่แยกโฟลเดอร์ → ตรวจ `/api/health` → ถ้าไม่ผ่าน **ถอยกลับเองอัตโนมัติ**
+
+👉 รายละเอียด (bootstrap, สิทธิ์ sudo, กลยุทธ์ DB, FAQ): **[docs/DEPLOY-MULTI-DOMAIN.md](docs/DEPLOY-MULTI-DOMAIN.md)**
 
 **ข้อควรทราบ**: รูปสินค้าอ้างอิงไฟล์จากเว็บเดิม (ใช้ `--images` เพื่อโหลดมาเก็บในเครื่อง),
 ราคาส่วนใหญ่ต้นฉบับเป็น 0 บาท (ขายแบบใบเสนอราคา) จึงแสดง “สอบถามราคา”,

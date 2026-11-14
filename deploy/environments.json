@@ -1,27 +1,46 @@
 {
-  "$comment": "Sub-domain map for the WordPress → Nuxt migration. `npm run vhost:gen -- --all` renders one nginx vhost per entry. www stays WordPress until the edge canary reaches 100 %.",
+  "$comment": "ONE host, several hosts names. Single source of truth for `npm run vhost:gen -- --all`, `deploy/deploy.sh` and `deploy/refresh-db.sh`. Edit here — never in the generated files.",
   "domain": "aph-ita.co.th",
-  "production": {
-    "host": "www.aph-ita.co.th",
-    "serves": "WordPress now → Nuxt after edge cut-over",
-    "port": null
+  "paths": {
+    "repo": "/srv/aph",
+    "releases": "/srv/aph/releases",
+    "shared": "/srv/aph/shared",
+    "env": "/etc/aph",
+    "keepReleases": 5
   },
   "environments": [
     {
+      "name": "staging",
       "host": "staging.aph-ita.co.th",
       "mode": "staging",
       "port": 3000,
+      "db": "aph_website_staging",
+      "syncSource": "aph_website",
+      "indexable": false,
       "auth": true,
-      "purpose": "ทีม dev/QA ตรวจงานก่อนขึ้น UAT — Basic Auth + noindex",
-      "indexable": false
+      "purpose": "ทีม dev/QA ตรวจงานก่อนขึ้น UAT — Basic Auth + noindex"
     },
     {
+      "name": "uat",
       "host": "uat.aph-ita.co.th",
       "mode": "uat",
       "port": 3010,
+      "db": "aph_website_uat",
+      "syncSource": "aph_website",
+      "indexable": false,
       "auth": false,
-      "purpose": "ให้ลูกค้า/ฝ่ายขายเปิดจากมือถือได้เลย (แชร์ลิงก์) แต่ห้าม Google เห็น",
-      "indexable": false
+      "purpose": "ให้ลูกค้า/ฝ่ายขายเปิดจากมือถือได้เลย (แชร์ลิงก์) แต่ห้าม Google เห็น"
+    },
+    {
+      "name": "www",
+      "host": "www.aph-ita.co.th",
+      "mode": "production",
+      "port": 3020,
+      "portAlt": 3030,
+      "db": "aph_website",
+      "indexable": true,
+      "auth": false,
+      "purpose": "ผู้ใช้จริง — WordPress จนถึง edge cut-over แล้วจึงเป็น Nuxt (blue/green สอง port)"
     }
   ]
 }

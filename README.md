@@ -226,14 +226,21 @@ npm run check:staging -- --url https://new.aph-ita.co.th --auth aph:secret
 `NUXT_PUBLIC_ROBOTS_NOINDEX=1` is a three-layer guard (header, meta tag, `Disallow: /`), so a
 half-finished staging build can never compete with the live WordPress site.
 
-Need more than one environment (internal staging **and** a password-less customer UAT)? One command each:
+The chosen setup is **two** sub-domains, both declared in [`deploy/environments.json`](deploy/environments.json):
+
+| host | who | mode | port | password | noindex |
+| --- | --- | --- | --- | --- | --- |
+| `staging.aph-ita.co.th` | dev/QA, technical customers | `staging` | 3000 | ✅ Basic Auth | ✅ 4 layers |
+| `uat.aph-ita.co.th` | customer / sales sign-off | `uat` | 3010 | — (shared link) | ✅ 4 layers |
 
 ```bash
-npm run vhost:gen -- --host staging.aph-ita.co.th --mode staging          # Basic Auth + noindex
-npm run vhost:gen -- --host uat.aph-ita.co.th     --mode uat --port 3010  # shareable, still noindex
-npm run vhost:gen -- --host new.aph-ita.co.th     --mode redirect         # 301 → www after cut-over
-sudo cp deploy/systemd/aph-nuxt@.service /etc/systemd/system/ && sudo systemctl enable --now aph-nuxt@3010
+npm run vhost:gen -- --all                   # renders both vhosts (refuses indexable:true)
+./deploy/install-subdomains.sh               # dry-run: shows every command
+sudo ./deploy/install-subdomains.sh --apply  # nginx + certbot + systemd aph-nuxt@3000/@3010
+npm run check:staging -- --url https://uat.aph-ita.co.th
 ```
+
+Env files per instance live in `deploy/env/`; `NUXT_PUBLIC_ROBOTS_NOINDEX=1` must be set for **both**.
 Read the trade-offs: **[docs/SUBDOMAIN-SETUP.md](docs/SUBDOMAIN-SETUP.md)**.
 
 ### What makes the switch invisible

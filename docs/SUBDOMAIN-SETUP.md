@@ -127,84 +127,106 @@ sudo rm /etc/nginx/sites-enabled/new.aph-ita.co.th && sudo nginx -s reload
 
 ---
 
-## 6. มีหลาย sub-domain พร้อมกัน (staging + UAT + beta)
+## 6. เปิดทั้ง `staging.` + `uat.` พร้อมกัน (แผนที่เลือกไว้)
 
-บางทีที่เดียวไม่พอ — เช่น อยากมี **ที่ทดสอบภายใน** (มีรหัส) และ **ที่ให้ลูกค้าลอง** (ไม่มีรหัส แต่ห้าม Google เห็น)
-ระบบรองรับหลาย sub-domain พร้อมกัน โดยแต่ละตัวรัน Nuxt คนละ port และมี vhost ของตัวเอง:
+**ตัดสินใจแล้ว:** ใช้ 2 sub-domain — อันหนึ่งมีรหัสสำหรับทีม อีกอันแชร์ให้ลูกค้าได้โดยไม่ต้องมีรหัส
+ทั้งคู่ **ห้าม Google เห็น** และทั้งคู่ใช้ฐานข้อมูล/โค้ดชุดเดียวกับ `www` (ต่างกันแค่ port + การป้องกัน)
+
+| host | ใครใช้ | mode | port | รหัสผ่าน | noindex |
+| --- | --- | --- | --- | --- | --- |
+| `staging.aph-ita.co.th` | ทีม dev/QA, ลูกค้าสายเทคนิค | `staging` | 3000 | ✅ Basic Auth | ✅ 4 ชั้น |
+| `uat.aph-ita.co.th` | ลูกค้า/ฝ่ายขาย เปิดจากมือถือ | `uat` | 3010 | ❌ แชร์ลิงก์ได้ | ✅ 4 ชั้น |
+| `www.aph-ita.co.th` | ผู้ใช้จริง | — | — | — | ปกติ (เป็น WordPress จนถึง cut-over) |
+
+แผนที่นี้อยู่ในไฟล์ **[`deploy/environments.json`](../deploy/environments.json)** — แก้ที่เดียว ไม่ต้องจำ
+
+### 6.1 DNS (ทำก่อนทุกอย่าง)
+
+| Type | Name | Value | TTL |
+| --- | --- | --- | --- |
+| A | `staging` | `<IP เครื่องใหม่>` | 300 |
+| A | `uat` | `<IP เครื่องใหม่>` | 300 |
 
 ```bash
-npm run vhost:gen -- --host staging.aph-ita.co.th --mode staging            # Basic Auth + noindex
-npm run vhost:gen -- --host uat.aph-ita.co.th     --mode uat --port 3010    # ให้ลูกค้าลอง (noindex)
-npm run vhost:gen -- --host new.aph-ita.co.th     --mode redirect           # หลัง cut-over → 301 ไป www
+dig +short staging.aph-ita.co.th
+dig +short uat.aph-ita.co.th     # ต้องได้ IP เครื่องใหม่ทั้งคู่ ก่อนไปขั้นถัดไป
 ```
 
-ไฟล์ที่ได้: `deploy/generated/<host>.conf` (สร้างจาก generator เสมอ เพื่อให้กฎ noindex/auth เหมือนกันทุก environment)
-
-### โหมดที่มี
-
-| mode | มีรหัสผ่าน | noindex | cache | ใช้กับ |
-| --- | --- | --- | --- | --- |
-| `staging` | ✅ Basic Auth | ✅ | ปิด cache | ทีมภายใน, ลูกค้าเทคนิค, UAT รอบสุดท้าย |
-| `uat` | ❌ (แชร์ลิงก์ได้) | ✅ | ปิด cache | ให้ลูกค้า/ฝ่ายขายกดดูจริงบนมือถือ |
-| `redirect` | — | — | — | หลัง cut-over: 301 → `www.aph-ita.co.th` |
-
-### ตารางที่แนะนำ (ชื่อ host ชัดเจน = ลดความสับสน)
-
-| host | mode | port | ใครใช้ | เปิดเมื่อ |
-| --- | --- | --- | --- | --- |
-| `staging.aph-ita.co.th` | staging | 3000 | ทีม dev/QA | ทันที (Phase 1) |
-| `uat.aph-ita.co.th` | uat | 3010 | ลูกค้า / ฝ่ายขาย | หลัง parity ผ่าน |
-| `new.aph-ita.co.th` | staging → redirect | — | ลิงก์ที่เคยแจกไปแล้ว | 301 หลัง cut-over |
-| `www.aph-ita.co.th` | — | — | ผู้ใช้จริง | edge canary |
-
-> กติกา: **ทุก sub-domain ต้องมี noindex และห้ามอยู่ใน sitemap** — ถ้า Google เห็นทั้ง `staging.` และ `www.`
-> ในเนื้อหาเดียวกัน จะเกิด soft-duplicate และอันดับจริงอาจแกว่ง
-
-### รันหลาย instance บนเครื่องเดียว
+### 6.2 สร้าง config (บนเครื่อง dev หรือเครื่องจริง)
 
 ```bash
-# 1) อ่านค่าที่ใช้ร่วมกัน (DB, legacy origin, analytics)
+npm run vhost:gen -- --all
+# ✔ deploy/generated/staging.aph-ita.co.th.conf  (mode=staging port=3000)
+# ✔ deploy/generated/uat.aph-ita.co.th.conf      (mode=uat     port=3010)
+```
+generator จะปฏิเสธทันทีถ้ามี environment ไหนถูกตั้ง `"indexable": true` — กันความผิดพลาดที่แพงที่สุดของงานนี้
+
+### 6.3 เตรียม env ของแต่ละ instance
+
+```bash
 sudo mkdir -p /etc/aph
-sudo tee /etc/aph/aph-common.env >/dev/null <<'EOF'
-NUXT_DB_HOST=127.0.0.1
-NUXT_DB_NAME=aph_website
-NUXT_DB_USER=aph
-NUXT_DB_PASSWORD=***
-NUXT_LEGACY_ORIGIN=https://www.aph-ita.co.th
-NUXT_PUBLIC_SITE_URL=https://www.aph-ita.co.th
-NUXT_PUBLIC_ZERO_PRICE_STYLE=woo
-EOF
-
-# 2) ค่าที่ต่างกันต่อ instance
-echo 'NUXT_PUBLIC_ROBOTS_NOINDEX=1' | sudo tee /etc/aph/aph-nuxt-3000.env
-echo 'NUXT_PUBLIC_ROBOTS_NOINDEX=1' | sudo tee /etc/aph/aph-nuxt-3010.env
-
-# 3) systemd template (รันได้หลาย port จากไฟล์เดียว)
-sudo cp deploy/systemd/aph-nuxt@.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now aph-nuxt@3000 aph-nuxt@3010
-systemctl status aph-nuxt@3010 --no-pager | head -5
+sudo install -m 640 -o root -g aph deploy/env/aph-common.env.example   /etc/aph/aph-common.env
+sudo install -m 640 -o root -g aph deploy/env/aph-nuxt-3000.env.example /etc/aph/aph-nuxt-3000.env
+sudo install -m 640 -o root -g aph deploy/env/aph-nuxt-3010.env.example /etc/aph/aph-nuxt-3010.env
+sudo vi /etc/aph/aph-common.env       # ใส่รหัส DB + GTM/GA IDs
 ```
 
-### ตรวจทุก sub-domain ด้วยคำสั่งเดียว
+> **สำคัญที่สุดในไฟล์นี้:** `NUXT_PUBLIC_ROBOTS_NOINDEX=1` ต้องอยู่ใน **ทั้ง** 3000 และ 3010
+> โดยเฉพาะ `uat` ที่ไม่มีรหัสผ่าน — flag นี้คือสิ่งเดียวที่กัน Google ไม่ให้เก็บเว็บที่ยังไม่พร้อม
+
+### 6.4 ติดตั้ง (คำสั่งเดียว, มี dry-run)
 
 ```bash
-for h in staging.aph-ita.co.th uat.aph-ita.co.th; do
-  echo "── $h"; npm run check:staging -- --url https://$h --auth aph:secret
-done
+./deploy/install-subdomains.sh              # ดูว่าจะทำอะไร (ไม่เปลี่ยนอะไร)
+sudo ./deploy/install-subdomains.sh --apply # ติดตั้งจริง
+```
+สคริปต์จะ: copy vhost → symlink → ออกใบรับรองด้วย certbot (ข้ามถ้ามีแล้ว) → enable `aph-nuxt@3000` + `aph-nuxt@3010` → `nginx -t` → reload
+
+ถ้าต้องการทำมือทีละขั้น:
+```bash
+sudo cp deploy/generated/staging.aph-ita.co.th.conf /etc/nginx/sites-available/staging.aph-ita.co.th
+sudo ln -sfn /etc/nginx/sites-available/staging.aph-ita.co.th /etc/nginx/sites-enabled/
+sudo certbot --nginx -d staging.aph-ita.co.th --redirect
+# ทำแบบเดียวกันกับ uat.aph-ita.co.th
+sudo apt-get install -y apache2-utils && sudo htpasswd -c /etc/nginx/.htpasswd-aph aph
+sudo systemctl enable --now aph-nuxt@3000 aph-nuxt@3010
+sudo nginx -t && sudo nginx -s reload
 ```
 
-### ข้อควรระวังเมื่อมีหลาย sub-domain
+### 6.5 ตรวจว่า “พร้อมและล่องหน”
 
-| เรื่อง | ทำอย่างไร |
+```bash
+# staging: ต้องได้ 401 เมื่อไม่มีรหัส
+curl -s -o /dev/null -w "%{http_code}\n" https://staging.aph-ita.co.th/
+npm run check:staging -- --url https://staging.aph-ita.co.th --auth aph:รหัสจริง
+
+# uat: ไม่มีรหัส แต่ต้องมี noindex ครบ
+npm run check:staging -- --url https://uat.aph-ita.co.th
+```
+
+ทั้งสองต้องจบด้วย `✅ ผ่านทุกข้อ` และมีครบ: `X-Robots-Tag`, meta robots, `robots.txt = Disallow: /`,
+canonical ชี้ `https://www.aph-ita.co.th`, `/my-account` + `/wp-admin` → 302 ไป WordPress, sitemap 269 URL
+
+### 6.6 ใครทำอะไรหลังเปิดใช้
+
+| งาน | ใช้ host ไหน |
 | --- | --- |
-| ใบรับรอง | `certbot --nginx -d host` ทีละตัว หรือทำ wildcard `*.aph-ita.co.th` (DNS-01) ครั้งเดียวจบ |
-| DNS | A record ทีละ sub-domain, TTL 300 — ห้าม CNAME ไป `www` |
-| Cloudflare Access แทน Basic Auth | ถ้าเปิด orange cloud + Zero Trust ให้เลือกอย่างใดอย่างหนึ่ง (ซ้อนกันจะได้ 401/302 วน) |
-| จำนวน environment | เก็บให้เหลือ 2–3 ตัว (staging, uat) พอ — ยิ่งมากยิ่งลืมปิด noindex/auth |
-| เลิกใช้แล้ว | เปลี่ยนเป็น `--mode redirect` (301 → www) แล้วค่อยลบ DNS ทีหลัง 30 วัน |
+| dev/QA ตรวจ PR, ดู console error, ทดสอบฟีเจอร์ใหม่ | `staging.` |
+| ฝ่ายขายโชว์ลูกค้า, ลูกค้ากดดูบนมือถือ, UAT เซ็นรับ | `uat.` |
+| เทียบ parity อัตโนมัติทุกคืน | ยิงใส่ `staging.` (`npm run parity -- --new https://staging.aph-ita.co.th`) |
+| ผู้ใช้จริง | `www.` เท่านั้น (edge canary) |
 
----
+> `uat.` เป็นลิงก์ที่หลุดออกไปข้างนอกได้ง่าย (LINE/Facebook) — ตรวจ `X-Robots-Tag` ซ้ำทุกครั้งก่อนส่ง
+> และอย่าลิงก์จากเว็บจริงมาที่นี่
+
+### 6.7 หลัง cut-over
+
+```bash
+npm run vhost:gen -- --host uat.aph-ita.co.th   --mode redirect   # 301 → www
+npm run vhost:gen -- --host staging.aph-ita.co.th --mode staging  # เก็บไว้ใช้ต่อ (มีรหัส + noindex)
+```
+`uat.` หมดหน้าที่เมื่อผู้ใช้ย้ายไป `www` แล้ว — เปลี่ยนเป็น 301 เพื่อไม่ให้ลิงก์เก่าตกหล่น
+`staging.` ควรเก็บไว้ระยะยาว เป็นที่ซ้อมเวอร์ชันถัดไป
 
 ## 7. คำสั่งสรุป
 
@@ -222,11 +244,12 @@ NUXT_LEGACY_ORIGIN=https://www.aph-ita.co.th npm run build
 
 npm run check:staging -- --url https://new.aph-ita.co.th --auth aph:secret
 
-# เพิ่ม sub-domain อีกตัว (staging / uat / beta)
-npm run vhost:gen -- --host uat.aph-ita.co.th --mode uat --port 3010
-sudo cp deploy/generated/uat.aph-ita.co.th.conf /etc/nginx/sites-available/uat.aph-ita.co.th
-sudo ln -sf /etc/nginx/sites-available/uat.aph-ita.co.th /etc/nginx/sites-enabled/
-sudo certbot --nginx -d uat.aph-ita.co.th --redirect && sudo nginx -t && sudo nginx -s reload
+# staging + uat (ตามแผนที่เลือก)
+npm run vhost:gen -- --all
+./deploy/install-subdomains.sh              # dry-run
+sudo ./deploy/install-subdomains.sh --apply
+npm run check:staging -- --url https://staging.aph-ita.co.th --auth aph:รหัสจริง
+npm run check:staging -- --url https://uat.aph-ita.co.th
 
 # ทางขึ้นจริง (โดเมนเดิม ไม่มี downtime)
 npm run edge:gen -- --rollout 1 && sudo nginx -s reload

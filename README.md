@@ -35,6 +35,21 @@ layout / UX / UI and the product catalogue.
 
 ---
 
+### Where it lives
+
+| URL | role | visibility |
+| --- | --- | --- |
+| `https://www.aph-ita.co.th` | **production** — WordPress now, Nuxt after the cut-over (blue/green `:3020`/`:3030`) | indexable |
+| `https://aph-ita.co.th` | apex → 301 to `www` | 301 |
+| `https://staging.aph-ita.co.th` | internal QA (`:3000`) | Basic Auth + noindex |
+| `https://uat.aph-ita.co.th` | customer sign-off (`:3010`, shareable link) | noindex |
+
+```bash
+npm run urls                   # print the map from deploy/environments.json
+npm run urls -- --check        # verify 401 / noindex / 301 for every live URL
+```
+Rules, DNS table, TLS and redirect matrix: **[docs/URL-MAP.md](docs/URL-MAP.md)**
+
 ## 2. Quick start
 
 ```bash
@@ -138,6 +153,7 @@ deploy/cloudflare/worker.js   same router as a Cloudflare Worker
 docs/MIGRATION-ZERO-DOWNTIME.md  full migration runbook (Thai)
 docs/SUBDOMAIN-SETUP.md       staging/uat sub-domains, noindex layers
 docs/DEPLOY-MULTI-DOMAIN.md   deploying several domains from one host (Thai)
+docs/URL-MAP.md               which URL serves what: DNS, TLS, redirects, canonical host
 docker-compose.yml         MariaDB 11 with utf8mb4 + healthcheck
 ```
 
@@ -402,6 +418,22 @@ npm run edge:gen -- --rollout 0     # rollback ทันที (< 1 วินา
 ทุกครั้งที่ deploy: release ใหม่แยกโฟลเดอร์ → ตรวจ `/api/health` → ถ้าไม่ผ่าน **ถอยกลับเองอัตโนมัติ**
 
 👉 รายละเอียด (bootstrap, สิทธิ์ sudo, กลยุทธ์ DB, FAQ): **[docs/DEPLOY-MULTI-DOMAIN.md](docs/DEPLOY-MULTI-DOMAIN.md)**
+
+### เอาขึ้นที่ URL ไหน
+
+| URL | ใช้ทำอะไร |
+| --- | --- |
+| **`https://www.aph-ita.co.th`** | เว็บจริง (WordPress → Nuxt หลัง cut-over) |
+| `https://aph-ita.co.th` | 301 → www |
+| `https://staging.aph-ita.co.th` | ที่ทดสอบภายใน (มีรหัส) |
+| `https://uat.aph-ita.co.th` | ให้ลูกค้า/ฝ่ายขายลอง (noindex) |
+
+```bash
+npm run urls            # ดูแผนที่ URL ทั้งหมด
+npm run urls -- --check # ตรวจจริง: staging ต้อง 401, uat ต้อง noindex, apex ต้อง 301
+```
+
+👉 **[docs/URL-MAP.md](docs/URL-MAP.md)** (DNS, TLS, กติกา redirect, สิ่งที่ห้ามทำ)
 
 **ข้อควรทราบ**: รูปสินค้าอ้างอิงไฟล์จากเว็บเดิม (ใช้ `--images` เพื่อโหลดมาเก็บในเครื่อง),
 ราคาส่วนใหญ่ต้นฉบับเป็น 0 บาท (ขายแบบใบเสนอราคา) จึงแสดง “สอบถามราคา”,

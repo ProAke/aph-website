@@ -25,7 +25,8 @@
     "deploy:staging": "./deploy/deploy.sh --env staging",
     "deploy:uat": "./deploy/deploy.sh --env uat",
     "deploy:www": "./deploy/deploy.sh --env www",
-    "db:refresh": "./deploy/refresh-db.sh"
+    "db:refresh": "./deploy/refresh-db.sh",
+    "urls": "node scripts/url-map.mjs"
   },
   "dependencies": {
     "mysql2": "^3.24.6",

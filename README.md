@@ -154,6 +154,7 @@ docs/MIGRATION-ZERO-DOWNTIME.md  full migration runbook (Thai)
 docs/SUBDOMAIN-SETUP.md       staging/uat sub-domains, noindex layers
 docs/DEPLOY-MULTI-DOMAIN.md   deploying several domains from one host (Thai)
 docs/URL-MAP.md               which URL serves what: DNS, TLS, redirects, canonical host
+docs/STATUS.md                living status report: done / not-yet-verified / blockers / next steps
 docker-compose.yml         MariaDB 11 with utf8mb4 + healthcheck
 ```
 
